@@ -1,0 +1,28 @@
+version: "3"
+services:
+  master:
+    build: ./master
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    networks:
+      - db
+    ports:
+      - "5500:5432"
+    environment:
+      - REP_USER=rep_user
+      - REP_PASSWORD=rep_password
+      - REP_DB=rep_test
+  listener:
+    build: ./listener
+    command: /listen.sh
+    networks:
+      - db
+    environment:
+      - PGHOST=master
+      - PGUSER=rep_user
+      - PGPASSWORD=rep_password
+      - PGAPPNAME=rep_test_app
+      - PGSSLMODE=require
+      - REP_DB=rep_test
+      - REP_SLOT=rep_test_slot
+networks:
+  db:
